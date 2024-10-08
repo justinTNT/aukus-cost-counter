@@ -1,0 +1,232 @@
+<head>
+<style>
+html { height: 100%; }
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #EEE;
+}
+
+.text { font-size: 3em; }
+.flip-clock {
+  text-align: center;
+  perspective: 400px;
+  margin: 2px auto;
+
+  *,
+  *:before,
+  *:after { box-sizing: border-box; }
+}
+
+.flip-clock__piece {
+  display: inline-block;
+  margin: 0 5px;
+}
+
+.flip-clock__slot {
+  font-size: 2vw;
+}
+
+
+.card {
+  display: block;
+  position: relative;
+  padding-bottom: 0.72em;
+  font-size: 8vw;
+  line-height: 0.95;
+}
+
+.card__top,
+.card__bottom,
+.card__back::before,
+.card__back::after {
+  display: block;
+  height: 0.72em;
+  color: #ccc;
+  background: #222;
+  padding: 0.25em 0.25em;
+  border-radius: 0.15em 0.15em 0 0;
+  backface-visiblity: hidden;
+  transform-style: preserve-3d;
+  width: 0.9em;
+  transform: translateZ(0);
+}
+
+.card__bottom {
+  color: #FFF;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  border-top: solid 1px #000;
+  background: #393939;
+  border-radius: 0 0 0.15em 0.15em;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.card__bottom::after {
+  display: block;
+  margin-top: -0.72em;
+}
+
+.card__back::before,
+.card__bottom::after {
+  content: attr(data-value);
+}
+
+.card__back {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: 0%;
+  pointer-events: none;
+}
+
+.card__back::before {
+  position: relative;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.flip .card__back::before {
+  animation: flipTop 0.3s cubic-bezier(.37,.01,.94,.35);
+  animation-fill-mode: both;
+  transform-origin: center bottom;
+}
+
+.flip .card__back .card__bottom {
+  transform-origin: center top;
+  animation-fill-mode: both;
+  animation: flipBottom 0.6s cubic-bezier(.15,.45,.28,1);// 0.3s;
+}
+
+@keyframes flipTop {
+  0% {
+    transform: rotateX(0deg);
+    z-index: 2;
+  }
+  0%, 99% {
+    opacity: 0.99;
+  }
+  100% {
+    transform: rotateX(-90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flipBottom {
+  0%, 50% {
+    z-index: -1;
+    transform: rotateX(90deg);
+    opacity: 0;
+  }
+  51% {
+    opacity: 0.99;
+  }
+  100% {
+    opacity: 0.99;
+    transform: rotateX(0deg);
+    z-index: 5;
+  }
+}
+</style>
+
+</head>
+<body>
+	<div class="text">
+		at $35M a day, every day, for thirty years, that's
+	</div>
+	<div id='ticker'></div>
+	<div class="text">
+		aussie dollaroos sunk on nuclear submarines
+	</div>
+<script>
+function CountdownTracker(value, index){
+
+	this.index = 10 - index;
+	var el = document.createElement('span');
+
+	el.className = 'flip-clock__piece';
+	el.innerHTML = '<b class="flip-clock__card card"><b class="card__top"></b><b class="card__bottom"></b><b class="card__back"><b class="card__bottom"></b></b></b>';
+
+	this.el = el;
+
+	var top = el.querySelector('.card__top'),
+			bottom = el.querySelector('.card__bottom'),
+			back = el.querySelector('.card__back'),
+			backBottom = el.querySelector('.card__back .card__bottom');
+
+	this.update = function(val){
+		val = Math.floor((val / (10 ** this.index)) % 10);
+		if ( val !== this.currentValue ) {
+
+			if ( this.currentValue >= 0 ) {
+				back.setAttribute('data-value', this.currentValue);
+				bottom.setAttribute('data-value', this.currentValue);
+			}
+			this.currentValue = val;
+			top.innerText = this.currentValue;
+			backBottom.setAttribute('data-value', this.currentValue);
+
+			this.el.classList.remove('flip');
+			void this.el.offsetWidth;
+			this.el.classList.add('flip');
+		}
+	}
+
+	this.update(value);
+}
+
+// Calculation adapted from https://www.sitepoint.com/build-javascript-countdown-timer-no-dependencies/
+
+
+const dollarsPerMiliSecond = Math.floor( 368000000000 / (60 * 60 * 24 * 365 * 30) ) / 1000;
+const commencement = Date.parse('15 Sep 2021 00:00:00 GMT');
+
+function updateFn(startPoint) {
+	var now = new Date().getTime();
+	var miliSeconds = Math.floor( (now - commencement) );
+	return startPoint + miliSeconds * dollarsPerMiliSecond;
+}
+
+function Clock(startPoint) {
+
+	this.el = document.createElement('div');
+	this.el.className = 'flip-clock';
+
+	var t = updateFn(startPoint);
+	var trackers = [];
+
+	this.el.appendChild(document.createElement('span'));
+	for (i=0; i< 11; i++) {
+		tracker = new CountdownTracker(t,i);
+		this.el.appendChild(tracker.el);
+		trackers[i] = tracker
+	}
+
+	var i = 0;
+	function updateClock() {
+		requestAnimationFrame(updateClock);
+		if (i++ % 5) return;
+
+		// throttle so it's not constantly updating the time.
+
+		var t = updateFn(startPoint);
+
+		for (tracker of trackers) {
+			tracker.update(t);
+		}
+	}
+
+	setTimeout(updateClock,500);
+}
+
+var startingPoint = 0; // 4500000000;
+var clock = new Clock(startingPoint);
+document.getElementById('ticker').appendChild(clock.el);
+</script>
+</body>
+
