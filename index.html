@@ -11,7 +11,37 @@ body {
   background: #EEE;
 }
 
-.text { font-size: 3vw; }
+#fg {
+  background: url('sub.jpg');
+  background-size: auto;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-size: cover;
+  animation: fadeAnimation ease 15s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeAnimation {
+    0% {
+	opacity: 1;
+    }
+
+    100% {
+	opacity: 0;
+    }
+}
+
+.content {
+	position: relative;
+	text-align: center;
+}
+
+.text {
+	font-size: 3vw;
+	margin: 3vw;
+}
 .flip-clock {
   text-align: center;
   perspective: 400px;
@@ -34,9 +64,9 @@ body {
 .card {
   display: block;
   position: relative;
-  padding-bottom: 0.72em;
+  padding-bottom: 6vw;
   font-size: 8vw;
-  line-height: 0.95;
+  line-height: 0.9;
 }
 
 .card__top,
@@ -44,14 +74,14 @@ body {
 .card__back::before,
 .card__back::after {
   display: block;
-  height: 0.72em;
+  height: 6vw;
   color: #ccc;
-  background: #222;
-  padding: 0.25em 0.25em;
+  background: #411;
+  padding: 3vw 1vw;
   border-radius: 0.15em 0.15em 0 0;
   backface-visiblity: hidden;
   transform-style: preserve-3d;
-  width: 0.9em;
+  width: 7vw;
   transform: translateZ(0);
 }
 
@@ -61,7 +91,7 @@ body {
   top: 50%;
   left: 0;
   border-top: solid 1px #000;
-  background: #393939;
+  background: #200;
   border-radius: 0 0 0.15em 0.15em;
   pointer-events: none;
   overflow: hidden;
@@ -69,7 +99,7 @@ body {
 
 .card__bottom::after {
   display: block;
-  margin-top: -0.72em;
+  margin-top: -6vw;
 }
 
 .card__back::before,
@@ -136,13 +166,16 @@ body {
 
 </head>
 <body>
-	<div class="text">
-		at $35M a day, every day, for thirty years, that's
+	<div class="content">
+		<div class="text">
+			at $35M a day, every day, for thirty years, that's
+		</div>
+		<div id='ticker'></div>
+		<div class="text">
+			aussie dollaroos sunk on nuclear submarines
+		</div>
 	</div>
-	<div id='ticker'></div>
-	<div class="text">
-		aussie dollaroos sunk on nuclear submarines
-	</div>
+	<div id="fg"></div>
 <script>
 function CountdownTracker(value, index){
 
@@ -210,7 +243,7 @@ function Clock(startPoint) {
 	var i = 0;
 	function updateClock() {
 		requestAnimationFrame(updateClock);
-		if (i++ % 5) return;
+		if (i++ % 9) return;
 
 		// throttle so it's not constantly updating the time.
 
@@ -224,9 +257,11 @@ function Clock(startPoint) {
 	setTimeout(updateClock,500);
 }
 
+screen.orientation.lock('landscape');
 var startingPoint = 0; // 4500000000;
 var clock = new Clock(startingPoint);
 document.getElementById('ticker').appendChild(clock.el);
+
 </script>
 </body>
 
