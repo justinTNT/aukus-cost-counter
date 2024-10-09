@@ -2,6 +2,18 @@
 <link rel="manifest" href="manifest.json">
 <style>
 html { height: 100%; }
+media screen and (min-width: 320px) and (max-width: 767px) and (orientation: portrait) {
+  html {
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    width: 100vh;
+    height: 100vw;
+    overflow-x: hidden;
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
+}
 body {
   min-height: 100%;
   display: flex;
@@ -18,7 +30,7 @@ body {
   height: 100%;
   position: absolute;
   background-size: cover;
-  animation: fadeAnimation ease 15s;
+  animation: fadeAnimation ease 5s;
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
 }
@@ -257,7 +269,6 @@ function Clock(startPoint) {
 	setTimeout(updateClock,500);
 }
 
-screen.orientation.lock('landscape');
 var startingPoint = 0; // 4500000000;
 var clock = new Clock(startingPoint);
 document.getElementById('ticker').appendChild(clock.el);
